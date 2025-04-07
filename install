@@ -1,0 +1,5 @@
+#!/bin/sh
+mkdir /usr/local/bin/ming-flashcards
+cp *.scm /usr/local/bin/ming-flashcards/
+cp mingMisc_Flashcards /usr/local/bin/mingMisc_Flashcards
+chmod +x /usr/local/bin/mingMisc_Flashcards
