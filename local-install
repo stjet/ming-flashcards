@@ -1,4 +1,5 @@
 #!/bin/sh
+rm -rf ~/.local/bin/ming-flashcards
 mkdir ~/.local/bin/ming-flashcards
 cp *.scm ~/.local/bin/ming-flashcards/
 cp mingMisc_Flashcards ~/.local/bin/mingMisc_Flashcards

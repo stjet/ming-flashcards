@@ -1,3 +1,10 @@
+(define line->question (lambda (line)
+  ;question and answer separated by #\x1F, I guess
+  (let ([parts (split-string line #\x1F -1)])
+    (cons (car parts) (cdr parts)) ;return pair. list would be funnier though
+  )
+))
+
 (define-record-type theme-info (fields top background border-left-top border-right-bottom text top-text alt-background alt-text alt-secondary))
 
 ;s-string->theme-info
@@ -38,17 +45,34 @@
 ;max should be -1 if no max is desired
 (define split-string (lambda (str split-char max)
   (define split-string-tail (lambda (chars current splitted)
-    (if (or (= (length chars) 0) (= (length splitted) max))
+    ;(= (length splitted) max)
+    (if (= (length chars) 0)
       (reverse (cons current splitted))
       (let (
         [c (car chars)]
-      ) (if (char=? c split-char)
+      ) (if (and (char=? c split-char) (not (= (- max 1) (length splitted))))
         (split-string-tail (cdr chars) "" (cons current splitted))
         (split-string-tail (cdr chars) (string-append current (string c)) splitted)
       ))
     )
   ))
   (split-string-tail (string->list str) "" '())
+))
+
+(define string-starts-with? (lambda (str starts-str)
+  (define string-starts-with-tail (lambda (index max)
+    (if (= index max)
+      #t
+      (if (char=? (string-ref str index) (string-ref starts-str index))
+        (string-starts-with-tail (+ index 1) max)
+        #f
+      )
+    )
+  ))
+  (if (< (string-length str) (string-length starts-str))
+    #f
+    (string-starts-with-tail 0 (string-length starts-str))
+  )
 ))
 
 (define s-string->list (lambda (str)
@@ -66,7 +90,7 @@
 
 (define draw-instructions-text (lambda (point fonts text colour bg-colour option-horiz-spacing option-mono-width)
   ;Text(Point, Vec<String>, String, RGBColor, RGBColor, Option<usize>, Option<u8>), //font and text
-  (string-append "Text/\x1E;" (s-list->string point) (s-list->string fonts) text (s-list->string colour) (s-list->string bg-colour) (s-option->string option-horiz-spacing) (s-option->string option-mono-width))
+  (string-append "Text/" (s-list->string point) "\x1E;" (s-list->string fonts) "\x1E;" text "\x1E;" (s-list->string colour) "\x1E;" (s-list->string bg-colour) "\x1E;" (s-option->string option-horiz-spacing) "\x1E;" (s-option->string option-mono-width))
 ))
 
 (define is-escape (lambda (c)
